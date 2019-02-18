@@ -75,6 +75,29 @@ server.put("/api/zoo/:id", (req, res) => {
 });
 
 // Delete
+server.delete("/api/zoo/:id", (req, res) => {
+  db("zoos")
+    .where({ id: req.params.id })
+    .del()
+    .then(count => {
+      if (count) {
+        res.status(200).json({
+          message: "Animal was moved out of the zoo successfully.",
+          numMoved: count
+        });
+      } else {
+        res.status(404).json({
+          message: "Animal could not be found in the zoo.",
+          numUpdated: count
+        });
+      }
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ message: "Error moving animal out of the zoo.", error: error });
+    });
+});
 
 const port = process.env.PORT || 4000;
 server.listen(port, function() {
