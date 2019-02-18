@@ -48,6 +48,31 @@ server.get("/api/zoo", (req, res) => {
     });
 });
 
+// Read single id
+server.get("/api/zoo/:id", (req, res) => {
+  console.log(req.params.id);
+  db("zoos")
+    .where({ id: req.params.id })
+    .then(animal => {
+      console.log(animal);
+      if (animal) {
+        res
+          .status(200)
+          .json({ message: "Animal found in the zoo.", animal: animal });
+      } else {
+        res
+          .status(404)
+          .json({ message: "Animal could not be found in the zoo." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Error searching for the animal in the zoo.",
+        error: err
+      });
+    });
+});
+
 // Update
 server.put("/api/zoo/:id", (req, res) => {
   const changes = req.body;
