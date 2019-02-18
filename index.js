@@ -13,6 +13,8 @@ server.get("/", (req, res) => {
   res.status(200).json("Dude!");
 });
 
+// ============================================================= Zoos Table CRUD Operations
+
 // Create
 server.post("/api/zoo", (req, res) => {
   db("zoos")
@@ -122,6 +124,99 @@ server.delete("/api/zoo/:id", (req, res) => {
         .status(500)
         .json({ message: "Error moving animal out of the zoo.", error: error });
     });
+});
+
+// ============================================================= Bears Table CRUD Operations
+
+// Read
+server.get("/api/bears", (req, res) => {
+  db("bears")
+    .then(bears => {
+      if (bears.length > 0) {
+        res
+          .status(200)
+          .json({ message: "Bears retrieved successfully", bears });
+      } else {
+        res.status(404).json({ message: "No bears were found." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+});
+
+// Read single id
+server.get("/api/bears/:id", (req, res) => {
+  db("bears")
+    .where({ id: req.params.id })
+    .then(bear => {
+      if (bear.length > 0) {
+        res
+          .status(200)
+          .json({ message: "The bear was found in the database.", bear });
+      } else {
+        res
+          .status(404)
+          .json({ message: "That bear was not found in the database." });
+      }
+    });
+});
+
+// Create
+server.post("/api/bears", (req, res) => {
+  db("bears")
+    .insert(req.body)
+    .then(ids => {
+      res.status(201).json(ids);
+    })
+    .catch(err =>
+      res.status(500).json({
+        message: "Error adding bear to the database."
+      })
+    );
+});
+
+// Update
+server.put("/api/bears/:id", (req, res) => {
+  const changes = req.body;
+  db("bears")
+    .where({ id: req.params.id })
+    .update(changes)
+    .then(count => {
+      if (count) {
+        res.status(200).json({
+          message: "Bear updated successfully in the database.",
+          bearsUpdatede: count
+        });
+      } else {
+        res
+          .status(404)
+          .json({ message: "Could not find that bear in the database." });
+      }
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ message: "Error updating the bear in the database." });
+    });
+});
+
+// Delete
+server.delete("/api/bears/:id", (req, res) => {
+  db("bears")
+    .where({ id: req.params.id })
+    .del()
+    .then(count => {
+      res.status(200).json({
+        message: "Bear deleted successsfully from the database.",
+        bearsDeleted: count
+      });
+    })
+    .catch(err =>
+      res
+        .status(500)
+        .json({ message: "Error deleting the bear from the database." })
+    );
 });
 
 const port = process.env.PORT || 4000;
