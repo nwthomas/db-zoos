@@ -49,6 +49,30 @@ server.get("/api/zoo", (req, res) => {
 });
 
 // Update
+server.put("/api/zoo/:id", (req, res) => {
+  const changes = req.body;
+  db("zoos")
+    .where({ id: req.params.id })
+    .update(changes)
+    .then(count => {
+      if (count) {
+        res.status(200).json({
+          message: "Animal was updated in the zoo successfully.",
+          numUpdated: count
+        });
+      } else {
+        res.status(404).json({
+          message: "Animal could not be found in the zoo.",
+          numUpdated: count
+        });
+      }
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ message: "Error updating the animal in the zoo.", error: err });
+    });
+});
 
 // Delete
 
